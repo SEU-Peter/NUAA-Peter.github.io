@@ -4,6 +4,31 @@
   
   
   <entry>
+    <title>hexo 博客新建文章</title>
+    <link href="/2022/12/20/hexo-%E5%8D%9A%E5%AE%A2%E6%96%B0%E5%BB%BA%E6%96%87%E7%AB%A0/"/>
+    <url>/2022/12/20/hexo-%E5%8D%9A%E5%AE%A2%E6%96%B0%E5%BB%BA%E6%96%87%E7%AB%A0/</url>
+    
+    <content type="html"><![CDATA[<h2 id="hexo-博客新建文章"><a href="#hexo-博客新建文章" class="headerlink" title="hexo 博客新建文章"></a>hexo 博客新建文章</h2><h4 id="创建文章"><a href="#创建文章" class="headerlink" title="创建文章"></a>创建文章</h4><figure class="highlight gauss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs gauss">hexo <span class="hljs-keyword">new</span> [layout] &lt;<span class="hljs-built_in">title</span>&gt;<br><span class="hljs-meta"># layout 默认为post</span><br></code></pre></td></tr></table></figure><h4 id="Front-matter-设置"><a href="#Front-matter-设置" class="headerlink" title="Front-matter 设置"></a>Front-matter 设置</h4><p><img src="https://nuaapeter.oss-cn-nanjing.aliyuncs.com/20200916181236318.png" alt="在这里插入图片描述"></p><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">title:</span> <span class="hljs-string">如何在hexo上创建一篇文章</span><br><span class="hljs-attr">date:</span> <span class="hljs-number">2020-09-16 19:33:46</span><br><span class="hljs-attr">categories:</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-string">博客</span><br><span class="hljs-attr">tags:</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-string">创建文章</span><br><span class="hljs-meta">---</span><br></code></pre></td></tr></table></figure><h4 id="上传"><a href="#上传" class="headerlink" title="上传"></a>上传</h4><figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs ebnf"><span class="hljs-attribute">hexo g</span><br><span class="hljs-attribute">hexo d</span><br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>技术博客</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>hexo</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>Mobisys22 CoDL 笔记</title>
     <link href="/2022/11/27/Mobisys22-CoDL-%E7%AC%94%E8%AE%B0/"/>
     <url>/2022/11/27/Mobisys22-CoDL-%E7%AC%94%E8%AE%B0/</url>
