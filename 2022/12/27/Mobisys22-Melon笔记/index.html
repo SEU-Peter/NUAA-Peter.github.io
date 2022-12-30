@@ -16,12 +16,12 @@
   <meta name="author" content="Peter Wan">
   <meta name="keywords" content="">
   
-    <meta name="description" content="2022-12-26 第6次组会汇报内容 Melon: Breaking the Memory Wall for Resource-Efficient On-Device Machine LearningAbstract设备上学习是一种很有前途的新兴隐私保护机器学习范式技术。然而，通过定量实验，&#x3D;&#x3D;我们发现商品移动设备由于本地内存容量有限，不能很好地支持足够大的批处理大小的最先">
+    <meta name="description" content="2022-12-26 第6次组会汇报内容">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Mobisys22 Melon笔记">
 <meta property="og:url" content="http://example.com/2022/12/27/Mobisys22-Melon%E7%AC%94%E8%AE%B0/index.html">
 <meta property="og:site_name" content="Peter&#39;s Blog">
-<meta property="og:description" content="2022-12-26 第6次组会汇报内容 Melon: Breaking the Memory Wall for Resource-Efficient On-Device Machine LearningAbstract设备上学习是一种很有前途的新兴隐私保护机器学习范式技术。然而，通过定量实验，&#x3D;&#x3D;我们发现商品移动设备由于本地内存容量有限，不能很好地支持足够大的批处理大小的最先">
+<meta property="og:description" content="2022-12-26 第6次组会汇报内容">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://nuaapeter.oss-cn-nanjing.aliyuncs.com/image-20221221211818878.png">
 <meta property="og:image" content="https://nuaapeter.oss-cn-nanjing.aliyuncs.com/image-20221221212605094.png">
@@ -44,7 +44,7 @@
 <meta property="og:image" content="https://nuaapeter.oss-cn-nanjing.aliyuncs.com/image-20221222173619623.png">
 <meta property="og:image" content="https://nuaapeter.oss-cn-nanjing.aliyuncs.com/image-20221222174919246.png">
 <meta property="article:published_time" content="2022-12-26T17:01:14.000Z">
-<meta property="article:modified_time" content="2022-12-26T17:03:55.591Z">
+<meta property="article:modified_time" content="2022-12-30T16:42:14.242Z">
 <meta property="article:author" content="Peter Wan">
 <meta property="article:tag" content="MobiSys22">
 <meta name="twitter:card" content="summary_large_image">
@@ -300,8 +300,7 @@
             
               <div class="markdown-body">
                 
-                <p>2022-12-26 第6次组会汇报内容</p>
-<h2 id="Melon-Breaking-the-Memory-Wall-for-Resource-Efficient-On-Device-Machine-Learning"><a href="#Melon-Breaking-the-Memory-Wall-for-Resource-Efficient-On-Device-Machine-Learning" class="headerlink" title="Melon: Breaking the Memory Wall for Resource-Efficient On-Device Machine Learning"></a>Melon: Breaking the Memory Wall for Resource-Efficient On-Device Machine Learning</h2><h3 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h3><p>设备上学习是一种很有前途的新兴隐私保护机器学习范式技术。然而，通过定量实验，&#x3D;&#x3D;我们发现商品移动设备由于本地内存容量有限，不能很好地支持足够大的批处理大小的最先进的DNN训练。&#x3D;&#x3D;为了填补这一空白，我们提出了Melon，这是一种内存友好的设备上学习框架，它使大批量训练任务超出物理内存容量。Melon明智地改进了现有的内存保存技术，以适应资源受限的移动设备，即重新计算和微批处理。Meon 进一步结合了新技术来处理高内存碎片和内存适应。Melon进一步结合了新的技术来处理高内存碎片和内存适应。我们在商用移动设备上使用各种典型的DNN模型实现和评估Melon。结果表明，在相同的内存预算下，Melon 可以实现高达 4.33× 的批量大小。给定相同的批量大小，Melon 平均实现了 1.89 倍（高达 4.01×）更高的训练吞吐量，并且与竞争替代方案相比节省了高达 49.43% 的能量。此外，Melon 在内存预算适应方面平均减少了 78.59% 的计算量。</p>
+                <h2 id="Mobisys22-Melon笔记"><a href="#Mobisys22-Melon笔记" class="headerlink" title="Mobisys22 Melon笔记"></a>Mobisys22 Melon笔记</h2><h3 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h3><p>设备上学习是一种很有前途的新兴隐私保护机器学习范式技术。然而，通过定量实验，&#x3D;&#x3D;我们发现商品移动设备由于本地内存容量有限，不能很好地支持足够大的批处理大小的最先进的DNN训练。&#x3D;&#x3D;为了填补这一空白，我们提出了Melon，这是一种内存友好的设备上学习框架，它使大批量训练任务超出物理内存容量。Melon明智地改进了现有的内存保存技术，以适应资源受限的移动设备，即重新计算和微批处理。Meon 进一步结合了新技术来处理高内存碎片和内存适应。Melon进一步结合了新的技术来处理高内存碎片和内存适应。我们在商用移动设备上使用各种典型的DNN模型实现和评估Melon。结果表明，在相同的内存预算下，Melon 可以实现高达 4.33× 的批量大小。给定相同的批量大小，Melon 平均实现了 1.89 倍（高达 4.01×）更高的训练吞吐量，并且与竞争替代方案相比节省了高达 49.43% 的能量。此外，Melon 在内存预算适应方面平均减少了 78.59% 的计算量。</p>
 <h3 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1 Introduction"></a>1 <strong>Introduction</strong></h3><p>深度神经网络 (DNN) 是当今移动应用程序的关键组成部分，例如语音助手、增强现实等。大量工作探索了如何利用强大的硬件和各种优化将 DNN 的推理阶段带入移动设备。作为向前迈出的一步，设备上的学习正在成为直接在移动设备上执行模型训练的新范式，特别是实现强大的&#x3D;&#x3D;隐私保护和个性化&#x3D;&#x3D;。它已经成为高级学习技术(如联邦学习、分裂学习等[41,60,67])和应用(如输入法、虚拟助手等[1,2,44]的基础。然而，由于本地硬件资源的限制，我们很直观地会问，现代DNN的训练在移动设备上是否负担得起。</p>
 <p>不幸的是，正如我们将在§2中定量显示的那样，即使是具有8GB内存的高端移动设备也无法支持足够大的批量DNN训练，这对于实现高精度和稳定收敛是至关重要的。换句话说，&#x3D;&#x3D;内存墙阻碍了训练性能&#x3D;&#x3D;。在联邦学习中，这种内存不足将被放大，因为低端设备将是端到端收敛的瓶颈。为此，我们的目标是通过内存优化技术打破内存墙。</p>
 <h5 id="Prior-wisdom"><a href="#Prior-wisdom" class="headerlink" title="Prior wisdom"></a>Prior wisdom</h5><p>我们注意到，模型训练的内存优化多年来在云计算中得到了广泛的研究，但在移动设备中很少讨论。因此，我们的第一个直觉是调查最成熟的云端内存优化技术是否可以用于移动设备。令我们惊讶的是，我们在§3 中的定量实验表明，云端技术很难应用于移动设备</p>

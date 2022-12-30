@@ -57,7 +57,7 @@
 <meta property="og:image" content="https://nuaapeter.oss-cn-nanjing.aliyuncs.com/image-20221117222350506.png">
 <meta property="og:image" content="https://nuaapeter.oss-cn-nanjing.aliyuncs.com/image-20221117222746827.png">
 <meta property="article:published_time" content="2022-11-27T09:54:27.000Z">
-<meta property="article:modified_time" content="2022-12-20T15:13:14.941Z">
+<meta property="article:modified_time" content="2022-12-30T16:43:05.264Z">
 <meta property="article:author" content="Peter Wan">
 <meta property="article:tag" content="MobiSys">
 <meta property="article:tag" content="notes">
@@ -314,11 +314,11 @@
             
               <div class="markdown-body">
                 
-                <h1 id="Mobisys22-CoDL-笔记"><a href="#Mobisys22-CoDL-笔记" class="headerlink" title="Mobisys22-CoDL 笔记"></a>Mobisys22-CoDL 笔记</h1><p>论文标题：“CoDL: Efficient CPU-GPU Co-execution for Deep Learning Inference on Mobile Devices”</p>
+                <h2 id="Mobisys22-CoDL-笔记"><a href="#Mobisys22-CoDL-笔记" class="headerlink" title="Mobisys22-CoDL 笔记"></a>Mobisys22-CoDL 笔记</h2><p>论文标题：“CoDL: Efficient CPU-GPU Co-execution for Deep Learning Inference on Mobile Devices”</p>
 <p>主讲人：Peter Wan 万 晔</p>
 <p>主讲时间：2022-11-22 19：00</p>
 <p>PPT地址：<a target="_blank" rel="noopener" href="https://liumengyang.xyz/ReadingGroup/slides/CoDL.pdf">https://liumengyang.xyz/ReadingGroup/slides/CoDL.pdf</a></p>
-<h2 id="ABSTRACT"><a href="#ABSTRACT" class="headerlink" title="ABSTRACT"></a>ABSTRACT</h2><p>​	异构处理器上的并发推理执行对于提高日益繁重的深度学习 (DL) 模型的性能至关重要。但是目前的推理框架只能一次使用一个处理器。这主要是因为有两大挑战。</p>
+<h3 id="ABSTRACT"><a href="#ABSTRACT" class="headerlink" title="ABSTRACT"></a>ABSTRACT</h3><p>​	异构处理器上的并发推理执行对于提高日益繁重的深度学习 (DL) 模型的性能至关重要。但是目前的推理框架只能一次使用一个处理器。这主要是因为有两大挑战。</p>
 <ol>
 <li>需要减小数据开销</li>
 <li>需要在处理器之间很好地划分每一个算子</li>
@@ -329,7 +329,7 @@
 <li><em>non-linearity- and concurrency-aware latency prediction</em>：通过为不同的处理器构建一个非常轻量而且准确的延迟预测器来指导合适的算子分区。</li>
 </ol>
 <p>​	在不同的深度学习模型上对CoDL进行评估，最终获得4.93$\times$的速度提高，和62.3%的性能节约。</p>
-<h2 id="1-INTRODUCTION"><a href="#1-INTRODUCTION" class="headerlink" title="1 INTRODUCTION"></a>1 INTRODUCTION</h2><p>背景：深度学习 (DL) 现在是各种移动应用程序的支柱。由于在隐私保护、互联网弹性和低云操作开销方面的优势，与云端（on-cloud）推理相比，设备推理(on-device)正在获得动力。然而，目前的设备端推理只能对一些简单模型实现可接受的响应能力，而对于其他模型则不行。例如，用于对象检测的 YOLO 需要超过 200 毫秒才能在主要的移动处理器（即移动 CPU 或 GPU）上运行。为了提高响应能力，一个自然的想法是在移动设备上同时利用异构处理器是否会有效。</p>
+<h3 id="1-INTRODUCTION"><a href="#1-INTRODUCTION" class="headerlink" title="1 INTRODUCTION"></a>1 INTRODUCTION</h3><p>背景：深度学习 (DL) 现在是各种移动应用程序的支柱。由于在隐私保护、互联网弹性和低云操作开销方面的优势，与云端（on-cloud）推理相比，设备推理(on-device)正在获得动力。然而，目前的设备端推理只能对一些简单模型实现可接受的响应能力，而对于其他模型则不行。例如，用于对象检测的 YOLO 需要超过 200 毫秒才能在主要的移动处理器（即移动 CPU 或 GPU）上运行。为了提高响应能力，一个自然的想法是在移动设备上同时利用异构处理器是否会有效。</p>
 <p>​	手机SOC的特定设计提供了这种可能，原因有两个</p>
 <ol>
 <li>相当的CPU与GPU性能。与PC端相差几个数量级不同，移动端的CPU与GPU在深度学习推理方面具有相似的性能，因此它们可以并排使用。</li>
@@ -367,7 +367,7 @@
 <li>提出极轻量但准确的非线性和并发感知延迟预测</li>
 <li>实施端到端 CoDL 框架并证明其性能优于最先进的解决方案</li>
 </ol>
-<h2 id="2-MOTIVATION-AND-ANALYSIS"><a href="#2-MOTIVATION-AND-ANALYSIS" class="headerlink" title="2.MOTIVATION AND ANALYSIS"></a>2.MOTIVATION AND ANALYSIS</h2><p>​	在设计CoDL之前，我们首先通过分析SOTA（SOTA model)：state-of-the-art model，并不是特指某个具体的模型，而是指在该项研究任务中，目前最好&#x2F;最先进的模型。SOTA result：state-of-the-art result，指的是在该项研究任务中，目前最好的模型的结果&#x2F;性能&#x2F;表现。）推理系统来探索协同执行的性能瓶颈。</p>
+<h3 id="2-MOTIVATION-AND-ANALYSIS"><a href="#2-MOTIVATION-AND-ANALYSIS" class="headerlink" title="2 MOTIVATION AND ANALYSIS"></a>2 MOTIVATION AND ANALYSIS</h3><p>​	在设计CoDL之前，我们首先通过分析SOTA（SOTA model)：state-of-the-art model，并不是特指某个具体的模型，而是指在该项研究任务中，目前最好&#x2F;最先进的模型。SOTA result：state-of-the-art result，指的是在该项研究任务中，目前最好的模型的结果&#x2F;性能&#x2F;表现。）推理系统来探索协同执行的性能瓶颈。</p>
 <p>​	我们按照μplayer（最佳协同处理模型）与MACE（最佳单处理器执行系统），分别进行了测试。在骁龙855平台上，CPU与GPU协同运算的μLayer要比但单CPU或GPU的MACE执行地慢。深入分析系统，当前并行系统的性能问题在于：</p>
 <ol>
 <li>不同的处理器使用了统一的数据类型</li>
@@ -396,7 +396,7 @@
 <p>​	预测不准确的原因是延迟与FLOPs不是简单的线性关系，而是受算法实现、数据块大小等平台特性（platform features）影响很大。如图 6 所示，随着 GPU 和 CPU 的 FLOPs 增加，延迟显示出非线性响应</p>
 <p><img src="https://nuaapeter.oss-cn-nanjing.aliyuncs.com/image-20221116212820722.png" srcset="/img/loading.gif" lazyload alt="image-20221116212820722"></p>
 <p>​	还有一些工作只在准确预测延迟，如nn-meter，它使用黑盒机器学习方法来学习基于多个算子超参数的延迟响应。然而，由于缺乏对底层平台特征的了解，黑盒方法以模型尺寸大为代价获得了令人满意的精度（例如，超过 800 MB 用于 nn-Meter 的卷积）和不可行的执行时间（例如，nn-Meter 在 PC 上超过 80 毫秒）。部署在移动设备上是不切实际的。因此，协同执行系统需要一个可以结合平台特性的延迟预测器，从而既轻便又准确。</p>
-<h2 id="3-CODL-OVERVIEW"><a href="#3-CODL-OVERVIEW" class="headerlink" title="3 CODL OVERVIEW"></a>3 CODL OVERVIEW</h2><p>​	为了在异构处理器上实现协同执行的最佳性能，我们提出了三个设计原则</p>
+<h3 id="3-CODL-OVERVIEW"><a href="#3-CODL-OVERVIEW" class="headerlink" title="3 CODL OVERVIEW"></a>3 CODL OVERVIEW</h3><p>​	为了在异构处理器上实现协同执行的最佳性能，我们提出了三个设计原则</p>
 <ol>
 <li>充分利用每个处理器的计算能力</li>
 <li>最小化由数据共享引起的额外开销，即数据转换、映射和同步</li>
@@ -413,7 +413,7 @@
 <p>​	operator co-executor根据分区计划协调operators的同步执行，针对不同的处理器使用其友好的数据类型。</p>
 <p><img src="https://nuaapeter.oss-cn-nanjing.aliyuncs.com/image-20221116214804551.png" srcset="/img/loading.gif" lazyload alt="image-20221116214804551"></p>
 <p>​	如图 8 所示，在链的开头，CoDL 首先在 CPU 和 GPU 之间共享数据。假设 GPU 友好类型为默认数据类型，CoDL 将分区输入特征图从 GPU 友好类型（例如，Adreno GPU 上的图像类型）转换为 CPU 友好类型。然后，CPU 和 GPU 同时执行一条链中的所有算子。在一条链的末端，GPU 将 CPU 上生成的数据转换回 GPU 友好类型，并与 GPU 输出结合在一起作为下一条链的输入。</p>
-<h2 id="4-HYBRID-TYPE-FRIENDLY-DATA-SHARING"><a href="#4-HYBRID-TYPE-FRIENDLY-DATA-SHARING" class="headerlink" title="4 HYBRID-TYPE FRIENDLY DATA SHARING"></a>4 HYBRID-TYPE FRIENDLY DATA SHARING</h2><p>​	CoDL 支持为每个处理器使用高效的数据类型，但是这也进一步增加的数据开销。本节介绍CoDL的两种数据共享优化技术，即混合维度划分和算子链。它们通过实现数据共享和计算开销之间的权衡来加速算子的共同执行</p>
+<h3 id="4-HYBRID-TYPE-FRIENDLY-DATA-SHARING"><a href="#4-HYBRID-TYPE-FRIENDLY-DATA-SHARING" class="headerlink" title="4 HYBRID-TYPE FRIENDLY DATA SHARING"></a>4 HYBRID-TYPE FRIENDLY DATA SHARING</h3><p>​	CoDL 支持为每个处理器使用高效的数据类型，但是这也进一步增加的数据开销。本节介绍CoDL的两种数据共享优化技术，即混合维度划分和算子链。它们通过实现数据共享和计算开销之间的权衡来加速算子的共同执行</p>
 <h4 id="4-1-Hybrid-dimension-partitioning"><a href="#4-1-Hybrid-dimension-partitioning" class="headerlink" title="4.1 Hybrid-dimension partitioning"></a>4.1 Hybrid-dimension partitioning</h4><ul>
 <li><strong>Performance impact analysis</strong></li>
 </ul>
@@ -455,7 +455,7 @@
 <p>​	算法思路<br>① 从一个不在任何链上的算子开始，对每一个可能的ρ，该算法不断链接更多的算子来计算与无链状况下的增益。<br>② 当再添加一个算子没有任何收益时停止<br>③ 此过程中，ρ 与 此链相关的最大链收益都会被记录下来，遍历完所有可能的ρ之后，最终记录到链的参数中。<br>④ 然后算法开始进行找下一个链</p>
 <p>ρ的大小在第一个算子的ρ的附近。<br>要将下一个算子添加到链中，我们需要将链上的每个前面的算子调整为新的填充大小，并使用延迟预测器重新计算总延迟。鉴于该算法检查每个运算符的次数等于比率范围的大小，搜索空间为<img src="https://nuaapeter.oss-cn-nanjing.aliyuncs.com/image-20221116224053725.png" srcset="/img/loading.gif" lazyload alt="image-20221116224053725"></p>
 <p><img src="https://nuaapeter.oss-cn-nanjing.aliyuncs.com/image-20221116224125346.png" srcset="/img/loading.gif" lazyload alt="image-20221116224125346"></p>
-<h2 id="5-NON-LINEARITY-AND-CONCURRENCY-AWARE-LATENCY-PREDICTION"><a href="#5-NON-LINEARITY-AND-CONCURRENCY-AWARE-LATENCY-PREDICTION" class="headerlink" title="5 NON-LINEARITY- AND CONCURRENCY-AWARE LATENCY PREDICTION"></a>5 NON-LINEARITY- AND CONCURRENCY-AWARE LATENCY PREDICTION</h2><p>​	CoDL 的分区和算子链技术依赖于算子协同执行的延迟预测。然而，挑战在于如何同时实现精确和轻量化。当前可用的延迟预测器中，由于两个原因不能很好地达到这个目的：</p>
+<h3 id="5-NON-LINEARITY-AND-CONCURRENCY-AWARE-LATENCY-PREDICTION"><a href="#5-NON-LINEARITY-AND-CONCURRENCY-AWARE-LATENCY-PREDICTION" class="headerlink" title="5 NON-LINEARITY- AND CONCURRENCY-AWARE LATENCY PREDICTION"></a>5 NON-LINEARITY- AND CONCURRENCY-AWARE LATENCY PREDICTION</h3><p>​	CoDL 的分区和算子链技术依赖于算子协同执行的延迟预测。然而，挑战在于如何同时实现精确和轻量化。当前可用的延迟预测器中，由于两个原因不能很好地达到这个目的：</p>
 <ol>
 <li>这些预测器都没有考虑数据共享开销</li>
 <li>由于缺乏底层平台的知识，预测器不能同时准确和轻量级</li>
@@ -487,12 +487,12 @@
 <p><img src="https://nuaapeter.oss-cn-nanjing.aliyuncs.com/image-20221116232632014.png" srcset="/img/loading.gif" lazyload alt="image-20221116232632014"></p>
 <p><img src="https://nuaapeter.oss-cn-nanjing.aliyuncs.com/image-20221116232716883.png" srcset="/img/loading.gif" lazyload alt="image-20221116232716883"></p>
 <p>​	等式中唯一的需要学习的变量是<em>t𝑏𝑎𝑠𝑖𝑐𝑈𝑛𝑖𝑡</em>，在给定处理器上执行一个基本单元的时间。它依赖于运算符超参数、内核实现、硬件资源和调度，难以解析建模。因此，我们可以从真正的处理器分析中了解每个内核实现的特性。既然已经提取了非线性，一个极轻线性回归模型可以用来学习t𝑏𝑎𝑠𝑖𝑐𝑈𝑛𝑖𝑡并达到较高的精度。这个模型的Features是（𝐻 , 𝑊 , 𝐼𝐶, 𝑂𝐶）。因为它很轻量，所以它可以在手机设备上被训练通过梯度下降。根据算法的不同，一个算子可以在多个内核中进行运算。处理器的计算时间就是所有内核计算时间的总和。</p>
-<h2 id="6-IMPLEMENTATION"><a href="#6-IMPLEMENTATION" class="headerlink" title="6 IMPLEMENTATION"></a>6 IMPLEMENTATION</h2><p>​	我们基于MACE实现CoDL, MACE[19]是移动设备上广泛使用的DL推理框架，在我们的评估中也具有SOTA性能。我们将CoDL的核心功能，即混合类型友好型数据共享和轻量级延迟预测器集成到Mace中。我们通过预编译的共享库来交付这些功能。因此，CoDL也可以很容易地适应到其他推理框架中。CoDL支持DL模型中常用算子的协同执行，包括卷积、完全连接和池化。</p>
+<h3 id="6-IMPLEMENTATION"><a href="#6-IMPLEMENTATION" class="headerlink" title="6 IMPLEMENTATION"></a>6 IMPLEMENTATION</h3><p>​	我们基于MACE实现CoDL, MACE[19]是移动设备上广泛使用的DL推理框架，在我们的评估中也具有SOTA性能。我们将CoDL的核心功能，即混合类型友好型数据共享和轻量级延迟预测器集成到Mace中。我们通过预编译的共享库来交付这些功能。因此，CoDL也可以很容易地适应到其他推理框架中。CoDL支持DL模型中常用算子的协同执行，包括卷积、完全连接和池化。</p>
 <p>​	为了在CPU和GPU上实现混合类型友好的数据共享，我们构建了基于OpenCL api的共享库。具体来说，我们使用Buffer和Image2D分别创建缓冲区和图像类型数据。我们实现了一个OpenCL内核来在缓冲区和图像类型之间转换数据。一旦数据被转换，我们使用enqueueMapBuffer来映射数据，使用enqueueUnmapMemO- object来取消映射。</p>
 <p>​	为了实现轻量级延迟预测器，我们使用了多特征线性回归模型。为了训练预测器，我们收集了数据转换、映射和计算的样本。对于数据转换和映射，我们使用数据大小作为特征。对于计算，我们使用(𝐻,𝑊 , 𝐼𝐶, 𝑂𝐶)作为特征。</p>
 <p>​	总之，我们在第7节中总共从5个DL模型中收集了大约6000个样本。我们在采样期间将CPU和GPU频率固定为最大值。我们运行算子从H到OC，ρ从0.1到1。</p>
 <p><img src="https://nuaapeter.oss-cn-nanjing.aliyuncs.com/image-20221116233836196.png" srcset="/img/loading.gif" lazyload alt="image-20221116233836196">我们使用70%的样本作为训练集，剩下的用于测试。我们将学习率设置为0.1，并对预测器进行大约1000个周期的训练。</p>
-<h2 id="7-EVALUATION"><a href="#7-EVALUATION" class="headerlink" title="7 EVALUATION"></a>7 EVALUATION</h2><h4 id="7-1-Experiment-setup"><a href="#7-1-Experiment-setup" class="headerlink" title="7.1 Experiment setup"></a>7.1 Experiment setup</h4><p><strong>Platforms</strong></p>
+<h3 id="7-EVALUATION"><a href="#7-EVALUATION" class="headerlink" title="7 EVALUATION"></a>7 EVALUATION</h3><h4 id="7-1-Experiment-setup"><a href="#7-1-Experiment-setup" class="headerlink" title="7.1 Experiment setup"></a>7.1 Experiment setup</h4><p><strong>Platforms</strong></p>
 <p>Snapdragon 855, 865, 888 and Kirin 990.</p>
 <p><strong>Models</strong></p>
 <p>RetinaFace (RF), YOLOv2 (YOLO) , VGG-16 (VGG) , PoseNet (PN)  and Fast Style Transfer (FST) </p>
@@ -559,7 +559,7 @@
 <p>​	已有的研究通过设计延迟预测模型来寻找高效的模型体系结构。cai 提出了一个以模型配置参数为特征的多项式回归模型，但该模型无法捕捉到底层平台特征的影响，而它在实践中可能占主导地位。nn-Meter在运行时考虑了多个算子的融合，使用黑盒随机森林模型预测时延。与现有工作不同的是，CoDL中的预测器考虑了处理器特性引起的延迟模式和并发特定的开销，使得预测器明显更加轻便和准确。</p>
 <p><strong>Acceleration of DL inference on mobile devices.</strong></p>
 <p>​	许多工作都在努力更好地利用设备上的处理器来加速DL推理</p>
-<h2 id="10-CONCLUSION"><a href="#10-CONCLUSION" class="headerlink" title="10 CONCLUSION"></a>10 CONCLUSION</h2><p>​	在本文中，我们提出了一种用于高效DL推断的CPU-GPU协同执行框架CoDL。CoDL智能地平衡了数据共享和计算的开销，方法是从混合维度对操作符进行自适应划分，并将操作符链接起来以减少数据共享时间。此外，通过设计一个轻量级但精确的延迟预测器，CoDL公平地将工作负载分配到异构处理器上，该预测器考虑了联合执行的开销和非线性平台特性。我们在主流硬件平台上对CoDL进行了评估，结果表明，与SOTA协同执行系统相比，CoDL的平均速度提高了3.43×，节能62.3%。</p>
+<h3 id="10-CONCLUSION"><a href="#10-CONCLUSION" class="headerlink" title="10 CONCLUSION"></a>10 CONCLUSION</h3><p>​	在本文中，我们提出了一种用于高效DL推断的CPU-GPU协同执行框架CoDL。CoDL智能地平衡了数据共享和计算的开销，方法是从混合维度对操作符进行自适应划分，并将操作符链接起来以减少数据共享时间。此外，通过设计一个轻量级但精确的延迟预测器，CoDL公平地将工作负载分配到异构处理器上，该预测器考虑了联合执行的开销和非线性平台特性。我们在主流硬件平台上对CoDL进行了评估，结果表明，与SOTA协同执行系统相比，CoDL的平均速度提高了3.43×，节能62.3%。</p>
 
                 
               </div>
