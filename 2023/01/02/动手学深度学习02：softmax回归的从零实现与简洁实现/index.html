@@ -1,0 +1,711 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/logo.png">
+  <link rel="icon" href="/img/logo.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Peter Wan">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="用两种方式实现了softmax回归">
+<meta property="og:type" content="article">
+<meta property="og:title" content="动手学深度学习02：softmax回归的从零实现与简洁实现">
+<meta property="og:url" content="http://seupeter.cn/2023/01/02/%E5%8A%A8%E6%89%8B%E5%AD%A6%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A002%EF%BC%9Asoftmax%E5%9B%9E%E5%BD%92%E7%9A%84%E4%BB%8E%E9%9B%B6%E5%AE%9E%E7%8E%B0%E4%B8%8E%E7%AE%80%E6%B4%81%E5%AE%9E%E7%8E%B0/index.html">
+<meta property="og:site_name" content="Peter&#39;s Blog">
+<meta property="og:description" content="用两种方式实现了softmax回归">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-01-01T18:01:49.000Z">
+<meta property="article:modified_time" content="2023-01-01T18:04:16.214Z">
+<meta property="article:author" content="Peter Wan">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="Deep Learning">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>动手学深度学习02：softmax回归的从零实现与简洁实现 - Peter&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"seupeter.cn","root":"/","version":"1.9.3","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Peter&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/back.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="动手学深度学习02：softmax回归的从零实现与简洁实现"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        Peter Wan
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-01-02 02:01" pubdate>
+          2023年1月2日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.9k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          41 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">动手学深度学习02：softmax回归的从零实现与简洁实现</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="动手学深度学习02：softmax回归的从零实现与简洁实现"><a href="#动手学深度学习02：softmax回归的从零实现与简洁实现" class="headerlink" title="动手学深度学习02：softmax回归的从零实现与简洁实现"></a>动手学深度学习02：softmax回归的从零实现与简洁实现</h2><p>参考：李沐 《动手学深度学习》 <a target="_blank" rel="noopener" href="http://zh.d2l.ai/">http://zh.d2l.ai/</a></p>
+<h3 id="从零实现"><a href="#从零实现" class="headerlink" title="从零实现"></a>从零实现</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> torch<br><span class="hljs-keyword">from</span> IPython <span class="hljs-keyword">import</span> display<br><span class="hljs-keyword">from</span> d2l <span class="hljs-keyword">import</span> torch <span class="hljs-keyword">as</span> d2l<br><span class="hljs-keyword">import</span> torch<br><span class="hljs-keyword">import</span> torchvision<br><span class="hljs-keyword">from</span> torch.utils <span class="hljs-keyword">import</span> data<br><span class="hljs-keyword">from</span> torchvision <span class="hljs-keyword">import</span> transforms<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">get_dataloader_workers</span>():  <span class="hljs-comment">#@save</span><br>    <span class="hljs-string">&quot;&quot;&quot;使用2个进程来读取数据&quot;&quot;&quot;</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-number">2</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">load_data_fashion_mnist</span>(<span class="hljs-params">batch_size, resize=<span class="hljs-literal">None</span></span>):  <span class="hljs-comment">#@save</span><br>    <span class="hljs-string">&quot;&quot;&quot;下载Fashion-MNIST数据集，然后将其加载到内存中&quot;&quot;&quot;</span><br>    trans = [transforms.ToTensor()]<br>    <span class="hljs-keyword">if</span> resize:<br>        trans.insert(<span class="hljs-number">0</span>, transforms.Resize(resize))<br>    trans = transforms.Compose(trans)<br>    mnist_train = torchvision.datasets.FashionMNIST(<br>        root=<span class="hljs-string">&quot;./data&quot;</span>, train=<span class="hljs-literal">True</span>, transform=trans, download=<span class="hljs-literal">True</span>)<br>    mnist_test = torchvision.datasets.FashionMNIST(<br>        root=<span class="hljs-string">&quot;./data&quot;</span>, train=<span class="hljs-literal">False</span>, transform=trans, download=<span class="hljs-literal">True</span>)<br>    <span class="hljs-keyword">return</span> (data.DataLoader(mnist_train, batch_size, shuffle=<span class="hljs-literal">True</span>,<br>                            num_workers=get_dataloader_workers()),<br>            data.DataLoader(mnist_test, batch_size, shuffle=<span class="hljs-literal">False</span>,<br>                            num_workers=get_dataloader_workers()))<br><br><span class="hljs-comment"># 定义一个load_data_fashion_mnist函数，用于获取和读取Fashion-MNIST数据集</span><br><span class="hljs-comment"># 这个函数返回训练集和验证集的数据迭代器。 </span><br><span class="hljs-comment"># 此外，这个函数还接受一个可选参数resize，用来将图像大小调整为另一种形状。</span><br><span class="hljs-comment"># d2l已经封装好了这个函数，可以直接d2l.load_data_fashion_mnist()调用</span><br><br>batch_size = <span class="hljs-number">256</span><br>train_iter, test_iter = load_data_fashion_mnist(batch_size)<br><br><span class="hljs-comment"># 原始数据集都是28*28图像，这里需要拉平及784的向量</span><br><span class="hljs-comment"># 参数初始化</span><br>num_inputs = <span class="hljs-number">784</span><br>num_outputs = <span class="hljs-number">10</span><br><br>W = torch.normal(<span class="hljs-number">0</span>, <span class="hljs-number">0.01</span>, size=(num_inputs, num_outputs), requires_grad=<span class="hljs-literal">True</span>)<br>b = torch.zeros(num_outputs, requires_grad=<span class="hljs-literal">True</span>)<br><br><span class="hljs-comment"># 定义softmax</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">softmax</span>(<span class="hljs-params">X</span>):<br>    X_exp = torch.exp(X)<br>    partition = X_exp.<span class="hljs-built_in">sum</span>(<span class="hljs-number">1</span>, keepdim=<span class="hljs-literal">True</span>) <span class="hljs-comment"># 对每一行求和</span><br>    <span class="hljs-keyword">return</span> X_exp / partition  <span class="hljs-comment"># 这里应用了广播机制</span><br><span class="hljs-comment"># 验证softmax的效果</span><br>X = torch.normal(<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, (<span class="hljs-number">2</span>, <span class="hljs-number">5</span>))<br>X_prob = softmax(X)<br><span class="hljs-built_in">print</span>(X_prob)<br><span class="hljs-built_in">print</span>(X_prob.<span class="hljs-built_in">sum</span>(<span class="hljs-number">1</span>))<br><br><span class="hljs-comment"># 定义模型</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">net</span>(<span class="hljs-params">X</span>):<br>    <span class="hljs-keyword">return</span> softmax(torch.matmul(X.reshape((-<span class="hljs-number">1</span>, W.shape[<span class="hljs-number">0</span>])), W) + b) <span class="hljs-comment"># x 此时为 batchsize * 784</span><br><br><br><span class="hljs-comment"># 定义损失函数</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">cross_entropy</span>(<span class="hljs-params">y_hat, y</span>):<br>    <span class="hljs-keyword">return</span> - torch.log(y_hat[<span class="hljs-built_in">range</span>(<span class="hljs-built_in">len</span>(y_hat)), y])<br><br><span class="hljs-comment"># 分类精度</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">accuracy</span>(<span class="hljs-params">y_hat, y</span>):  <span class="hljs-comment">#@save</span><br>    <span class="hljs-string">&quot;&quot;&quot;计算预测正确的数量&quot;&quot;&quot;</span><br>    <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(y_hat.shape) &gt; <span class="hljs-number">1</span> <span class="hljs-keyword">and</span> y_hat.shape[<span class="hljs-number">1</span>] &gt; <span class="hljs-number">1</span>:<br>        y_hat = y_hat.argmax(axis=<span class="hljs-number">1</span>) <span class="hljs-comment"># 每一行中最大元素的索引</span><br>    cmp = y_hat.<span class="hljs-built_in">type</span>(y.dtype) == y<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">float</span>(cmp.<span class="hljs-built_in">type</span>(y.dtype).<span class="hljs-built_in">sum</span>())<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">evaluate_accuracy</span>(<span class="hljs-params">net, data_iter</span>):  <span class="hljs-comment">#@save</span><br>    <span class="hljs-string">&quot;&quot;&quot;计算在指定数据集上模型的精度&quot;&quot;&quot;</span><br>    <span class="hljs-keyword">if</span> <span class="hljs-built_in">isinstance</span>(net, torch.nn.Module):<br>        net.<span class="hljs-built_in">eval</span>()  <span class="hljs-comment"># 将模型设置为评估模式</span><br>    metric = Accumulator(<span class="hljs-number">2</span>)  <span class="hljs-comment"># 正确预测数、预测总数</span><br>    <span class="hljs-keyword">with</span> torch.no_grad():<br>        <span class="hljs-keyword">for</span> X, y <span class="hljs-keyword">in</span> data_iter:<br>            metric.add(accuracy(net(X), y), y.numel()) <span class="hljs-comment"># 正确数与总数</span><br>    <span class="hljs-keyword">return</span> metric[<span class="hljs-number">0</span>] / metric[<span class="hljs-number">1</span>]<br><span class="hljs-comment"># 累计器</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Accumulator</span>:  <span class="hljs-comment">#@save</span><br>    <span class="hljs-string">&quot;&quot;&quot;在n个变量上累加&quot;&quot;&quot;</span><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, n</span>):<br>        self.data = [<span class="hljs-number">0.0</span>] * n<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">add</span>(<span class="hljs-params">self, *args</span>):<br>        self.data = [a + <span class="hljs-built_in">float</span>(b) <span class="hljs-keyword">for</span> a, b <span class="hljs-keyword">in</span> <span class="hljs-built_in">zip</span>(self.data, args)]<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">reset</span>(<span class="hljs-params">self</span>):<br>        self.data = [<span class="hljs-number">0.0</span>] * <span class="hljs-built_in">len</span>(self.data)<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__getitem__</span>(<span class="hljs-params">self, idx</span>):<br>        <span class="hljs-keyword">return</span> self.data[idx]<br><br><span class="hljs-comment"># 训练</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">train_epoch_ch3</span>(<span class="hljs-params">net, train_iter, loss, updater</span>):  <span class="hljs-comment">#@save</span><br>    <span class="hljs-string">&quot;&quot;&quot;训练模型一个迭代周期（定义见第3章）&quot;&quot;&quot;</span><br>    <span class="hljs-comment"># 将模型设置为训练模式</span><br>    <span class="hljs-keyword">if</span> <span class="hljs-built_in">isinstance</span>(net, torch.nn.Module):<br>        net.train()<br>    <span class="hljs-comment"># 训练损失总和、训练准确的总和、样本数</span><br>    metric = Accumulator(<span class="hljs-number">3</span>)<br>    <span class="hljs-keyword">for</span> X, y <span class="hljs-keyword">in</span> train_iter:<br>        <span class="hljs-comment"># 计算梯度并更新参数</span><br>        y_hat = net(X)<br>        l = loss(y_hat, y)<br>        <span class="hljs-keyword">if</span> <span class="hljs-built_in">isinstance</span>(updater, torch.optim.Optimizer):<br>            <span class="hljs-comment"># 使用PyTorch内置的优化器和损失函数</span><br>            updater.zero_grad()<br>            l.mean().backward()<br>            updater.step()<br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-comment"># 使用定制的优化器和损失函数</span><br>            l.<span class="hljs-built_in">sum</span>().backward()<br>            updater(X.shape[<span class="hljs-number">0</span>])<br>        metric.add(<span class="hljs-built_in">float</span>(l.<span class="hljs-built_in">sum</span>()), accuracy(y_hat, y), y.numel())<br>    <span class="hljs-comment"># 返回训练损失和训练精度</span><br>    <span class="hljs-keyword">return</span> metric[<span class="hljs-number">0</span>] / metric[<span class="hljs-number">2</span>], metric[<span class="hljs-number">1</span>] / metric[<span class="hljs-number">2</span>]<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">train_ch3</span>(<span class="hljs-params">net, train_iter, test_iter, loss, num_epochs, updater</span>):  <span class="hljs-comment">#@save</span><br>    <span class="hljs-string">&quot;&quot;&quot;训练模型（定义见第3章）&quot;&quot;&quot;</span><br>    <span class="hljs-keyword">for</span> epoch <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(num_epochs):<br>        train_metrics = train_epoch_ch3(net, train_iter, loss, updater)<br>        test_acc = evaluate_accuracy(net, test_iter)<br>    train_loss, train_acc = train_metrics<br>    <span class="hljs-keyword">assert</span> train_loss &lt; <span class="hljs-number">0.5</span>, train_loss<br>    <span class="hljs-keyword">assert</span> train_acc &lt;= <span class="hljs-number">1</span> <span class="hljs-keyword">and</span> train_acc &gt; <span class="hljs-number">0.7</span>, train_acc<br>    <span class="hljs-keyword">assert</span> test_acc &lt;= <span class="hljs-number">1</span> <span class="hljs-keyword">and</span> test_acc &gt; <span class="hljs-number">0.7</span>, test_acc<br><br>lr = <span class="hljs-number">0.1</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">updater</span>(<span class="hljs-params">batch_size</span>):<br>    <span class="hljs-keyword">return</span> d2l.sgd([W, b], lr, batch_size)<br><br>num_epochs = <span class="hljs-number">10</span><br>train_ch3(net, train_iter, test_iter, cross_entropy, num_epochs, updater)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">predict_ch3</span>(<span class="hljs-params">net, test_iter, n=<span class="hljs-number">6</span></span>):  <span class="hljs-comment">#@save</span><br>    <span class="hljs-string">&quot;&quot;&quot;预测标签（定义见第3章）&quot;&quot;&quot;</span><br>    <span class="hljs-keyword">for</span> X, y <span class="hljs-keyword">in</span> test_iter:<br>        <span class="hljs-keyword">break</span><br>    <span class="hljs-comment"># trues = d2l.get_fashion_mnist_labels(y)</span><br>    <span class="hljs-comment"># preds = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1))</span><br>    <span class="hljs-comment"># titles = [true +&#x27;\n&#x27; + pred for true, pred in zip(trues, preds)]</span><br>    <span class="hljs-comment"># d2l.show_images(</span><br>    <span class="hljs-comment">#     X[0:n].reshape((n, 28, 28)), 1, n, titles=titles[0:n])</span><br>    <span class="hljs-built_in">print</span>(y)<br>    <span class="hljs-built_in">print</span>(net(X).argmax(axis=<span class="hljs-number">1</span>))<br><br>predict_ch3(net, test_iter)<br></code></pre></td></tr></table></figure>
+
+<h3 id="简洁实现"><a href="#简洁实现" class="headerlink" title="简洁实现"></a>简洁实现</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> torch<br><span class="hljs-keyword">from</span> torch <span class="hljs-keyword">import</span> nn<br><span class="hljs-keyword">from</span> d2l <span class="hljs-keyword">import</span> torch <span class="hljs-keyword">as</span> d2l<br><br>batch_size = <span class="hljs-number">256</span><br>train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)<br><br><span class="hljs-comment"># PyTorch不会隐式地调整输入的形状。因此，</span><br><span class="hljs-comment"># 我们在线性层前定义了展平层（flatten），来调整网络输入的形状</span><br>net = nn.Sequential(nn.Flatten(), nn.Linear(<span class="hljs-number">784</span>, <span class="hljs-number">10</span>))<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">init_weights</span>(<span class="hljs-params">m</span>):<br>    <span class="hljs-keyword">if</span> <span class="hljs-built_in">type</span>(m) == nn.Linear:<br>        nn.init.normal_(m.weight, std=<span class="hljs-number">0.01</span>)<br><br>net.apply(init_weights)<br>loss = nn.CrossEntropyLoss(reduction=<span class="hljs-string">&#x27;none&#x27;</span>)<br>trainer = torch.optim.SGD(net.parameters(), lr=<span class="hljs-number">0.1</span>)<br>num_epochs = <span class="hljs-number">10</span><br>d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)<br></code></pre></td></tr></table></figure>
+
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%8A%A8%E6%89%8B%E5%AD%A6%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" class="category-chain-item">动手学深度学习</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/AI/">#AI</a>
+      
+        <a href="/tags/Deep-Learning/">#Deep Learning</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>动手学深度学习02：softmax回归的从零实现与简洁实现</div>
+      <div>http://seupeter.cn/2023/01/02/动手学深度学习02：softmax回归的从零实现与简洁实现/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Peter Wan</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年1月2日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/01/01/%E5%8A%A8%E6%89%8B%E5%AD%A6%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A001%EF%BC%9A%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92%E7%9A%84%E4%BB%8E%E9%9B%B6%E5%AE%9E%E7%8E%B0%E4%B8%8E%E7%AE%80%E6%B4%81%E5%AE%9E%E7%8E%B0/" title="动手学深度学习01：线性回归的从零实现与简洁实现">
+                        <span class="hidden-mobile">动手学深度学习01：线性回归的从零实现与简洁实现</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <span>Copyright</span> <i class="iconfont icon-copyright"></i> <span>2022 Peter Wan 版权所有</span> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
