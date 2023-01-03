@@ -4,6 +4,35 @@
   
   
   <entry>
+    <title>动手学深度学习08：卷积中的填充与步幅</title>
+    <link href="/2023/01/03/%E5%8A%A8%E6%89%8B%E5%AD%A6%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A008%EF%BC%9A%E5%8D%B7%E7%A7%AF%E4%B8%AD%E7%9A%84%E5%A1%AB%E5%85%85%E4%B8%8E%E6%AD%A5%E5%B9%85/"/>
+    <url>/2023/01/03/%E5%8A%A8%E6%89%8B%E5%AD%A6%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A008%EF%BC%9A%E5%8D%B7%E7%A7%AF%E4%B8%AD%E7%9A%84%E5%A1%AB%E5%85%85%E4%B8%8E%E6%AD%A5%E5%B9%85/</url>
+    
+    <content type="html"><![CDATA[<h2 id="动手学深度学习08：卷积中的填充与步幅"><a href="#动手学深度学习08：卷积中的填充与步幅" class="headerlink" title="动手学深度学习08：卷积中的填充与步幅"></a>动手学深度学习08：卷积中的填充与步幅</h2><p>一个240×240像素的图像，经过10层5×5的卷积后，将减少到200×200像素。</p><p>如此一来，原始图像的边界丢失了许多有用信息。而<em>填充</em>是解决此问题最有效的方法； </p><p>有时，我们可能希望大幅降低图像的宽度和高度。例如，如果我们发现原始的输入分辨率十分冗余。<em>步幅</em>则可以在这类情况下提供帮助。</p><h3 id="填充"><a href="#填充" class="headerlink" title="填充"></a>填充</h3><p><img src="https://nuaapeter.oss-cn-nanjing.aliyuncs.com/image-20230103174147447.png" alt="image-20230103174147447"></p><p>通常，如果我们添加𝑝ℎ行填充（大约一半在顶部，一半在底部）和𝑝𝑤列填充（左侧大约一半，右侧一半），则输出形状将为<br>$$<br>(n_h-k_h+p_h+1)\times(n_w-k_w+p_w+1)<br>$$<br>在许多情况下，我们需要设置$p_h&#x3D;k_h-1$和$p_w&#x3D;k_w-1$，使输入和输出具有相同的高度和宽度。</p><h3 id="步幅"><a href="#步幅" class="headerlink" title="步幅"></a>步幅</h3><p>每次滑动元素的数量称为<em>步幅</em>（stride）</p><p><img src="https://nuaapeter.oss-cn-nanjing.aliyuncs.com/image-20230103181024590.png" alt="image-20230103181024590"></p><p>通常，当垂直步幅为$s_h$、水平步幅为$s_w$时，输出形状为<br>$$<br>\lfloor(n_h-k_h+p_h+s_h)&#x2F;s_h\rfloor \times \lfloor(n_w-k_w+p_w+s_w)&#x2F;s_w\rfloor<br>$$<br>如果我们设置了$p_h&#x3D;k_h-1$和$p_w&#x3D;k_w-1$，则输出形状将简化为$\lfloor(n_h+s_h-1)&#x2F;s_h\rfloor \times \lfloor(n_w+s_w-1)&#x2F;s_w\rfloor$。<br>更进一步，如果输入的高度和宽度可以被垂直和水平步幅整除，则输出形状将为$(n_h&#x2F;s_h) \times (n_w&#x2F;s_w)$。</p><h3 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> torch<br><span class="hljs-keyword">from</span> torch <span class="hljs-keyword">import</span> nn<br><br><br><span class="hljs-comment"># 为了方便起见，我们定义了一个计算卷积层的函数。</span><br><span class="hljs-comment"># 此函数初始化卷积层权重，并对输入和输出提高和缩减相应的维数</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">comp_conv2d</span>(<span class="hljs-params">conv2d, X</span>):<br>    <span class="hljs-comment"># 这里的（1，1）表示批量大小和通道数都是1</span><br>    X = X.reshape((<span class="hljs-number">1</span>, <span class="hljs-number">1</span>) + X.shape)<br>    Y = conv2d(X)<br>    <span class="hljs-comment"># 省略前两个维度：批量大小和通道</span><br>    <span class="hljs-keyword">return</span> Y.reshape(Y.shape[<span class="hljs-number">2</span>:])<br><br><span class="hljs-comment"># 请注意，这里每边都填充了1行或1列，因此总共添加了2行或2列</span><br>conv2d = nn.Conv2d(<span class="hljs-number">1</span>, <span class="hljs-number">1</span>, kernel_size=<span class="hljs-number">3</span>, padding=<span class="hljs-number">1</span>)<br>X = torch.rand(size=(<span class="hljs-number">8</span>, <span class="hljs-number">8</span>))<br><span class="hljs-built_in">print</span>(comp_conv2d(conv2d, X).shape)<br><br><span class="hljs-comment"># 当卷积核的高度和宽度不同时，可以填充不同的高度和宽度</span><br>conv2d = nn.Conv2d(<span class="hljs-number">1</span>, <span class="hljs-number">1</span>, kernel_size=(<span class="hljs-number">5</span>, <span class="hljs-number">3</span>), padding=(<span class="hljs-number">2</span>, <span class="hljs-number">1</span>))<br><span class="hljs-built_in">print</span>(comp_conv2d(conv2d, X).shape)<br><br>conv2d = nn.Conv2d(<span class="hljs-number">1</span>, <span class="hljs-number">1</span>, kernel_size=<span class="hljs-number">3</span>, padding=<span class="hljs-number">1</span>, stride=<span class="hljs-number">2</span>)<br><span class="hljs-built_in">print</span>(comp_conv2d(conv2d, X).shape)<br><br>conv2d = nn.Conv2d(<span class="hljs-number">1</span>, <span class="hljs-number">1</span>, kernel_size=(<span class="hljs-number">3</span>, <span class="hljs-number">5</span>), padding=(<span class="hljs-number">0</span>, <span class="hljs-number">1</span>), stride=(<span class="hljs-number">3</span>, <span class="hljs-number">4</span>))<br><span class="hljs-built_in">print</span>(comp_conv2d(conv2d, X).shape)<br><br></code></pre></td></tr></table></figure><h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><ul><li>填充可以增加输出的高度和宽度。这常用来使输出与输入具有相同的高和宽。</li><li>步幅可以减小输出的高和宽，例如输出的高和宽仅为输入的高和宽的1&#x2F;𝑛1&#x2F;n（𝑛n是一个大于11的整数）。</li><li>填充和步幅可用于有效地调整数据的维度。</li></ul>]]></content>
+    
+    
+    <categories>
+      
+      <category>动手学深度学习</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>AI</tag>
+      
+      <tag>Deep Learning</tag>
+      
+      <tag>CNN</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>动手学深度学习07：从全连接层到卷积</title>
     <link href="/2023/01/03/%E5%8A%A8%E6%89%8B%E5%AD%A6%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A007%EF%BC%9A%E4%BB%8E%E5%85%A8%E8%BF%9E%E6%8E%A5%E5%B1%82%E5%88%B0%E5%8D%B7%E7%A7%AF/"/>
     <url>/2023/01/03/%E5%8A%A8%E6%89%8B%E5%AD%A6%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A007%EF%BC%9A%E4%BB%8E%E5%85%A8%E8%BF%9E%E6%8E%A5%E5%B1%82%E5%88%B0%E5%8D%B7%E7%A7%AF/</url>
